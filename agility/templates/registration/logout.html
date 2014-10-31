@@ -1,0 +1,17 @@
+{% extends "registration/base.html" %}
+{% load i18n %}
+
+
+{% block title %}
+    <center>
+      <h1 class="page_title">{%blocktrans%}Logged out{%endblocktrans%}</h1>
+  </center>
+{% endblock %}
+
+{% block content %}
+<center>
+    
+	<h1>{%blocktrans%}You've been logged out.{%endblocktrans%}</h1>
+	<p>{%blocktrans%}Thanks for stopping by; when you come back, don't forget to <a href="../../accounts/login/">log in</a> again.{%endblocktrans%}</p>
+</center>
+{% endblock %}

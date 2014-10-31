@@ -1,0 +1,101 @@
+{% extends "registration/base.html" %}
+{% load i18n %}
+
+{% block title %}
+    <center>
+      <h1 class="page_title">{%blocktrans%}Sign up{%endblocktrans%}</h1>
+  </center>
+{% endblock %}
+
+
+{% block content %}
+    <center>
+    
+    <h1 class="page_subtitle" style="margin-top:15px">{%blocktrans%}I create my account with Facebook{%endblocktrans%}</h1>
+    <form action="{% url facebook_connect %}" method="post">
+        <br />
+        {% csrf_token %}
+        <input type="hidden" value="{% if next %}{{next}}{% else %}{% url home %}{% endif %}" name="next" />
+
+        <div id="facebook_login_redirect">
+            <input type="image" class="django_facebook" src="{{ STATIC_URL }}django_facebook/images/{% trans 'facebook_login.png' %}" /><br />
+        </div>
+    </form>
+
+
+    <h1 class="page_subtitle">{%blocktrans%}I create an account{%endblocktrans%}</h1>
+    {% if form.errors %}
+    <p class="errors">{%blocktrans%}Please correct the errors below:{%endblocktrans%} {{ form.non_field_errors }}</p>
+    {% endif %}
+
+    
+    <form method="post" action="" class="wide">
+      {% csrf_token %}
+  	<table class="form">
+      <tr>
+        <th>
+          * {{form.username.label_tag}}:
+        </th>
+        <td style="padding-right: 75px;">
+          {{form.username.errors}}
+          {{form.username}}
+        </td>
+        <th>
+          {{form.first_name.label_tag}}:
+        </th>
+        <td>
+          {{form.first_name.errors}}
+          {{form.first_name}}
+        </td>
+      </tr>
+      <tr>
+        <th>
+          * {{form.email.label_tag}}:
+        </th>
+        <td>
+          {{form.email.errors}}
+          {{form.email}}
+        </td>
+        <th>
+          {{form.last_name.label_tag}}:
+        </th>
+        <td>
+          {{form.last_name.errors}}
+          {{form.last_name}}
+        </td>
+      </tr>
+      <tr>
+        <th>
+          * {{form.password1.label_tag}}:
+        </th>
+        <td>
+          {{form.password1.errors}}
+          {{form.password1}}
+        </td>
+        <th>
+        </th>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          * {{form.password2.label_tag}}:
+        </th>
+        <td>
+          {{form.password2.errors}}
+          {{form.password2}}
+        </td>
+        <th>
+        </th>
+        <td>
+        </td>
+      </tr>
+    </table>
+      <p class="submit"><input type="submit" value="{% trans 'Sign up' %}"></p>
+    </form>
+  </center>
+
+{% include 'django_facebook/_facebook_js.html' %}
+
+{% endblock %}
+

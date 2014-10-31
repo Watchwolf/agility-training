@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block extra_head %}
+    {% if is_edit %}
+      <meta property="og:title" content="Agility Training: {{course.name}}" />
+      <meta property="og:description" content="{{course.description}}" />
+
+      <meta property="og:type" content="website" />
+      <meta property="og:image" content="http://agility-training.fr/{% url preview_course course.id %}" />
+      <meta property="og:url" content="http://agility-training.fr/{% url view_course course.id %}" />
+    {% endif %}
+
+    <script src="{{STATIC_URL}}agility/js/raphael-min.js"></script>
+    <script src="{{STATIC_URL}}agility/js/raphael.export.js"></script>
+    <script src="{{STATIC_URL}}agility/js/canvg/StackBlur.js"></script>
+    <script src="{{STATIC_URL}}agility/js/canvg/rgbcolor.js"></script>
+    <script src="{{STATIC_URL}}agility/js/canvg/canvg.js"></script>
+    <script src="{{STATIC_URL}}agility/js/editor/editor.js"></script>
+
+    <style>
+      .form input {
+        width: 70%;
+      }
+      .form textarea {
+        width: 70%;
+      }
+    </style>
+{% endblock %}
+
+{% block title %}
+    <center>
+      {% if is_edit %}
+        <h1 class="page_title">{%blocktrans%}Edit a course{%endblocktrans%}</h1>
+      {% else %}
+        <h1 class="page_title">{%blocktrans%}Create a new course{%endblocktrans%}</h1>
+      {% endif %}
+  </center>
+{% endblock %}
+
+
+{% block content_full %}
+<div style="text-align:center;width:100%;">
+
+    {% if form.errors %}
+    <p class="errors">{%blocktrans%}Please correct the errors below:{%endblocktrans%} {{ form.non_field_errors }}</p>
+    {% endif %}
+
+
+    <canvas id="editor_canvas" style="display:none;"></canvas>
+    <img id="editor_image" style="display:none;"></img>
+    <canvas id="editor_canvas_image" style="display:none;" width="1000px" height="1000px"></canvas>
+    <form method="post" action="" id="form">
+      {% csrf_token %}
+      {{form.json.as_hidden}}
+      {{form.preview.as_hidden}}
+
+      {% if is_edit %}
+      <div style="float:right;min-height:50px;">&nbsp;
+        <span class='st_facebook_large' displayText='Facebook'></span>
+          <span class='st_twitter_large' displayText='Tweet'></span>
+          <span class='st_googleplus_large' displayText='Google +'></span>
+      </div>
+      {% endif %}
+      <table class="form" width="100%">
+        {% if form.name.errors %}
+          <tr>
+            <td>{{form.name.errors}}</td>
+          </tr>
+        {% endif %}
+        <tr>
+          <td>* <b>{{form.name.label_tag}}: </b> {{form.name}}&nbsp;&nbsp;&nbsp;&nbsp;<b>{{form.type.label_tag}}: </b>{{form.type}}</td>
+        </tr>
+        {% if form.json.errors %}
+          <tr>
+            <td>{{form.json.errors}}</td>
+          </tr>
+        {% endif %}
+      </table>
+            <div id="editor" style="margin: 0 auto;-webkit-backface-visibility:hidden; -webkit-transform: translate3d(0,0,0);"></div></td>
+        
+      <table class="form" width="100%">
+        <tr>
+          <th style="text-align:center;">{{form.description.label_tag}}</th>
+        </tr>
+        {% if form.description.errors %}
+          <tr>
+            <td>{{form.description.errors}}</td>
+          </tr>
+        {% endif %}
+        <tr>
+          <td>{{form.description}}</td>
+        </tr>
+        {% if is_edit %}
+        <tr>
+          <td><b><label for="share_link">{% trans 'Share link' %}</label>: </b> <input id="share_link" type="text" name="share_link" value="{{course.get_share_url}}" maxlength="255"></td>
+        </tr>
+        {% endif %}
+
+    
+
+    </table>
+    <br>
+    <input type="submit" value="{%blocktrans%}Save the course{%endblocktrans%}" />
+    </form>
+
+</div>
+
+        
+
+<script>
+    function get_size_from_type() {
+      val = $('#id_type').val();
+      new_width = editor.width;
+      new_height = editor.height;
+
+      if(val == '4xteams') {
+        new_width = 2*4000;
+        new_height = 2*4000;
+      }
+      if(val == '40x40') {
+        new_width = 4000;
+        new_height = 4000;
+      }
+
+      return [new_width, new_height];
+    }
+    $(function() {
+      var editor;
+
+      if($('#id_json').val() != '') {
+        json = $('#id_json').val();
+        json = eval("(" + json + ")");
+        editor = editor_json_load('editor', json , "{{STATIC_URL}}agility/js/editor/images/", false);
+      } else {
+        new_ = get_size_from_type();
+        new_width = new_[0];
+        new_height = new_[1];
+
+        editor = editor_create(
+              holder_id = "editor", 
+              width = new_width,
+              height = new_height,
+              static_path = "{{STATIC_URL}}agility/js/editor/images/",
+              false
+          );
+      }
+      resize();
+
+      function resize() {
+        val = $('#id_type').val();
+        old_type_select = val;
+        
+        new_ = get_size_from_type();
+        new_width = new_[0];
+        new_height = new_[1];
+        
+        editor_resize(editor, new_width, new_height);
+        $('#content').css('width', editor.width_px + 24);  
+      }
+
+      var old_type_select = $('#id_type').val();
+      $('#id_type').change(function() {
+        
+        new_ = get_size_from_type();
+        new_width = new_[0];
+        new_height = new_[1];
+        
+        if( new_width < editor.width || new_height < editor.height) {
+          $( "#dialog-resize-smaller" ).dialog('open');
+        } else {
+          resize();
+        }
+      });
+
+
+      var submit = false;
+      $('#form').submit(function() {
+        if(!submit) {
+          editor_unselect_all(editor);
+          json = editor_json_get(editor);
+          json = JSON.stringify(json);
+          $('#id_json').val(json);
+
+          var svg = editor.R.toSVG();
+          canvg(document.getElementById('editor_canvas'), svg);
+          setTimeout(function() {
+            //recherche des min et max pour centrer sur le parcours
+            bbox = editor_course_bbox_get(editor);
+
+            var dataURL = document.getElementById('editor_canvas').toDataURL("image/png");
+            document.getElementById("editor_image").src = dataURL;
+            
+            $('#editor_canvas_image').attr('width', bbox.width);
+            $('#editor_canvas_image').attr('height', bbox.height);
+            var c=document.getElementById("editor_canvas_image");
+            var ctx=c.getContext("2d");
+            ctx.drawImage(document.getElementById("editor_image"), 
+              bbox.x, bbox.y, bbox.width, bbox.height,
+              0, 0, bbox.width, bbox.height);
+            
+
+            // $('#editor_canvas_image').attr('width', editor.width_px - editor.toolbar_left_width - editor.toolbar_right_width);
+            // $('#editor_canvas_image').attr('height', editor.height_px);
+            // var c=document.getElementById("editor_canvas_image");
+            // var ctx=c.getContext("2d");
+            // ctx.drawImage(document.getElementById("editor_image"), 
+            //   editor.toolbar_left_width, 0, editor.width_px - editor.toolbar_left_width - editor.toolbar_right_width, editor.height_px,
+            //   0, 0, editor.width_px - editor.toolbar_left_width - editor.toolbar_right_width, editor.height_px);
+            
+            var dataURL = document.getElementById('editor_canvas_image').toDataURL("image/png");
+            $('#id_preview').val(dataURL);
+            $('#form').submit();
+            submit = true;
+          }, 100);
+          return false;
+        } else {
+            return true;
+          }
+      });
+
+
+      $( "#dialog-resize-smaller" ).dialog({
+        modal: true,
+        height: 250,
+        width: 600,
+        autoOpen: false,
+        buttons: {
+          "{% trans 'Cancel' %}": function() {
+            $('#id_type').val(old_type_select);
+            $( this ).dialog( "close" );
+          },
+          "{% trans 'Ok resize the field' %}": function() {
+            $( this ).dialog( "close" );
+            resize();
+          }
+        }
+      });
+
+
+    });
+</script>
+
+
+<div id="dialog-resize-smaller" title="&nbsp;" style="display:none;">
+  <p>
+    <span class="ui-icon ui-icon-circle-check" style="float:left; margin:0 7px 50px 0;"></span>
+    {% trans 'The new field size will be smaller than the current, all obstacles outside the new field will be deleted.' %}
+  </p>
+</div>
+
+{% endblock %}

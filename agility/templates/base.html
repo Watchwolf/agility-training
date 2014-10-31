@@ -1,0 +1,99 @@
+{% load i18n %}
+{% load localeurl_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Agility Training</title>
+        <script src="{{STATIC_URL}}agility/js/jquery-1.11.1.min.js"></script>
+        <script src="{{STATIC_URL}}agility/js/jquery-ui-1.11.0.custom/jquery-ui.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}agility/js/jquery-ui-1.11.0.custom/jquery-ui.css">
+
+        <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}agility/css/main.css">
+
+        <script type="text/javascript" src="{{STATIC_URL}}agility/js/slimmenu/jquery.slimmenu.js"></script>
+        <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}agility/js/slimmenu/slimmenu.css" media="screen" />
+
+        <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
+        <script type="text/javascript">
+            stLight.options({publisher: "8455096a-1aeb-4889-b030-b6170a4494fb", doNotHash: true, doNotCopy: true, hashAddressBar: false});
+            stLight.options({publisher:"8455096a-1aeb-4889-b030-b6170a4494fb", shorten:false}); 
+        </script>
+
+        {% block extra_head %}{% endblock %}
+
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-53232135-1', 'auto');
+          ga('send', 'pageview');
+
+        </script>
+
+    </head>
+    <body style="margin:0px;padding:0px;">
+        <div id="header">
+            <div style="float:left; margin-left:30px;">
+                <a href="{% url home %}"><img src="{{STATIC_URL}}agility/images/logo.png" style="vertical-align: middle;"></a>
+            </div>
+            <div style="float:right">
+                <ul  id="navigation" class="slimmenu">
+                  <li><a href="{% url new_course %}">{% trans 'Create a course' %}</a></li>
+                  {% if user.is_authenticated %}
+                      <li><a href="{% url my_courses %}">{% trans 'My courses' %}</a></li>
+                      <li><a href="{% url latests_courses %}">{% trans 'Latests courses' %}</a></li>
+                      <li>
+                        <a href="{% url user_profile %}">{{user.get_full_name}}</a>
+                        <ul>
+                            <li><a href="{% url user_profile %}">{%blocktrans%}My profile{%endblocktrans%}</a></li>
+                            <li><a href="{% url auth_logout %}">{%blocktrans%}Log out{%endblocktrans%}</a></li>
+                        </ul>
+                      </li>
+                  {% endif %}
+                  {% if not user.is_authenticated %}
+                    <li><a href="{% url latests_courses %}">{% trans 'Latests courses' %}</a></li>
+                    <li><a href="{% url registration_register %}">{%blocktrans%}Sign up{%endblocktrans%}</a></li>
+                    <li><a href="{% url auth_login %}">{%blocktrans%}Log in{%endblocktrans%}</a></li>
+                  {% endif %}
+                </ul>
+
+            </div>
+        </div>
+        <div id="content_full">
+                        <div id="content">
+                            {% block title %}{% endblock %}
+                            {% block content_full %}
+                            <div style="padding: 20px;">
+                                {% block content %}{% endblock %}
+                            </div>
+                            {% endblock %}
+                        </div>
+        </div>
+        <div id="footer">
+            <div style="float:left;margin-left:30px;">Agility Training - © Copyright 2014</div>
+            <div style="float:right;margin-right:30px;vertical-align:middle;">
+                <a href="{{ request.path|chlocale:'fr' }}"><img src="{{STATIC_URL}}agility/images/fr.png"> {% trans 'French' %}</a> | 
+                <a href="{{ request.path|chlocale:'en' }}"><img src="{{STATIC_URL}}agility/images/us.png"> {% trans 'English' %}</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp; 
+                <a href="mailto:jonathan.atton@gmail.com">{% trans 'Contact' %}</a>
+            </div>
+        </div>
+
+
+        <script>
+            $('#navigation').slimmenu(
+            {
+                resizeWidth: '800',
+                collapserTitle: 'Main Menu',
+                animSpeed: 'fast',
+                easingEffect: null,
+                indentChildren: false,
+                childrenIndenter: '&nbsp;'
+            });
+        </script>
+    </body>
+</html>

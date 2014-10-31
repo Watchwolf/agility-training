@@ -1,0 +1,23 @@
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Agility Training</title>
+        <script src="{{STATIC_URL}}agility/js/jquery-1.11.1.min.js"></script>
+        </head>
+    <body style="margin:0px;padding:0px;">
+
+		<img src="" id="editor_image">
+
+		{{course.preview}}
+		<script>
+		    $(function() {
+		      document.getElementById("editor_image").src = '{{course.preview}}';
+		      #window.location.replace("{{course.preview}}");
+		    });
+		</script>
+
+</body>
+</html>

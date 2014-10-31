@@ -1,0 +1,3 @@
+{% load i18n %}
+
+{%blocktrans%}Activate your agility-training.fr account - you have {{ expiration_days }} days!{%endblocktrans%}

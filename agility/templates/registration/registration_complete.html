@@ -1,0 +1,16 @@
+{% extends "registration/base.html" %}
+{% load i18n %}
+
+{% block title %}
+    <center>
+      <h1 class="page_title">{%blocktrans%}Check your email{%endblocktrans%}</h1>
+  </center>
+{% endblock %}
+
+
+{% block content %}
+    <center>
+    
+<p>{%blocktrans%}An activation link has been sent to the email address you supplied, along with instructions for activating your account.{%endblocktrans%}</p>
+</center>
+{% endblock %}

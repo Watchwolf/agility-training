@@ -1,0 +1,1 @@
+export PYTHONPATH=:/home/test/codes/agility-training/apps_django_1_4/:/home/test/codes/agility-training/apps_django_1_4/Django-1.4.3:/home/test/codes/agility-training/agility/:/home/test/codes/agility-training-private/
