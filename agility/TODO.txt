@@ -1,5 +1,0 @@
-page d'accueil
-largeur des numéros
-editor_load -> recréer les attaches
-editor -> niveau A/tunnel
-génération image -> manque les flêches
